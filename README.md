@@ -7,3 +7,4 @@ A powerful javafx web browser
   - Google search from url field
   - Web View Tabs ;)
   
+Java 8u45+ ;)
