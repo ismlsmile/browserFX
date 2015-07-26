@@ -29,12 +29,13 @@ public class PowerBrowser extends Tab {
     private AnchorPane anchorPaneHistoria = new AnchorPane();
     Scene scene;
     ListView<Downloader> downloads;
+    String last;
 
     public PowerBrowser(NotificationPane notificationPane, TextField urlTextField, Scene scene,ListView<Downloader> downloads) {
         this.scene = scene;
         this.downloads = downloads;
-        setText("New Tab");
-        ProgressBar progressBar = new ProgressBar();
+        setText("Loading");
+        ProgressBar progressBar = new ProgressBar(1);
         progressNotification = new NotificationPane();
         setContent(progressNotification);
         WebView view = new WebView();
@@ -52,7 +53,9 @@ public class PowerBrowser extends Tab {
 
 
         engine.setOnStatusChanged(event -> {
-            urlTextField.setText(engine.getLocation());
+            if (engine.getLocation().startsWith("http")) {
+                urlTextField.setText(engine.getLocation());
+            }
             if (engine.getTitle() != null) {
                 if (engine.getTitle().length() < 20) {
                     setText(engine.getTitle());
@@ -63,7 +66,7 @@ public class PowerBrowser extends Tab {
 
         });
 
-        engine.locationProperty().addListener((observable, oldValue, newValue) ->{
+        engine.locationProperty().addListener((observable, oldValue, newValue) -> {
             if (downloadableFiles(engine.getLocation())) {
                 downloadFile(engine.getLocation());
 
@@ -82,9 +85,12 @@ public class PowerBrowser extends Tab {
         engine.setOnAlert(event -> System.out.println(event.getData()));
 
         engine.getLoadWorker().exceptionProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue != null) {
-                System.out.println(newValue.getMessage());
-                engine.load("https://www.google.com.mx/#q=" + urlTextField.getText());
+            System.out.println("Old value: " + oldValue + " new Value: " + newValue);
+            if (newValue != null) {
+                if (!last.startsWith("https://www.google.com")) {
+                    engine.load("https://www.google.com.mx/#q=" + last);
+                    urlTextField.clear();
+                }
             }
         });
 
@@ -93,7 +99,7 @@ public class PowerBrowser extends Tab {
         notificationPane.textProperty().bind(engine.getLoadWorker().messageProperty());
 
         progressBar.progressProperty().bind(engine.getLoadWorker().progressProperty());
-        progressBar.setPrefWidth(200);
+        progressBar.setPrefWidth(300);
 
         ToolBar toolBarHistoria = new ToolBar();
         anchorPaneHistoria.getChildren().add(toolBarHistoria);
@@ -112,6 +118,7 @@ public class PowerBrowser extends Tab {
         toolBarHistoria.getItems().add(botonExitHistoria);
         botonExitHistoria.setOnAction(event -> splitPane.getItems().remove(anchorPaneHistoria));
 
+        
     }
 
     public WebEngine getEngine() {
@@ -129,8 +136,9 @@ public class PowerBrowser extends Tab {
     }
 
     public void go(String url) {
+        last = url;
         if (!url.startsWith("http://") || !url.startsWith("https://")) {
-            engine.load("http://" + url);
+            engine.load("http://" + url+"/");
         } else {
             engine.load(url);
         }

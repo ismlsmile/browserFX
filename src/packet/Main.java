@@ -55,7 +55,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
+        toolBar.setStyle("-fx-base:#747474");
         scene = new Scene(notificationPane, 800, 700);
         notificationPane.setGraphic(indicator);
         notificationPane.setContent(root);
