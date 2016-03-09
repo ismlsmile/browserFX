@@ -47,7 +47,7 @@ public class PowerBrowser extends Tab {
                 notificationPane.hide();
             }
         });
-        engine.load("http://www.google.com/");
+        engine.load("https://www.google.com/");
         progressNotification.setContent(splitPane);
         splitPane.getItems().add(view);
 
@@ -88,7 +88,7 @@ public class PowerBrowser extends Tab {
             System.out.println("Old value: " + oldValue + " new Value: " + newValue);
             if (newValue != null) {
                 if (!last.startsWith("https://www.google.com")) {
-                    engine.load("https://www.google.com.mx/#q=" + last);
+                    //engine.load("https://www.google.com.mx/#q=" + last);
                     urlTextField.clear();
                 }
             }
